@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UTech CTF Hub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Syne:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+</head>
+<body>
+
+<nav>
+  <div class="logo" onclick="go('learn')"><div class="logo-dot"></div>UTECH::CTF</div>
+  <div class="nav-links">
+    <button class="nav-btn active" id="nb-learn"      onclick="go('learn')">Learn</button>
+    <button class="nav-btn"        id="nb-challenges" onclick="go('challenges')">Challenges</button>
+    <button class="nav-btn"        id="nb-jeopardy"   onclick="go('jeopardy')">Jeopardy</button>
+    <button class="nav-btn"        id="nb-quizzes"    onclick="go('quizzes')">Quizzes</button>
+    <button class="nav-btn"        id="nb-scoreboard" onclick="go('scoreboard')">Scoreboard</button>
+    <button class="nav-btn"        id="nb-admin"      onclick="go('admin')">Admin</button>
+    <button class="nav-btn"        id="nb-login"      onclick="go('login')">Login</button>
+  </div>
+  <div class="nav-right">
+    <div class="pts-chip" id="hpts">1,337 pts</div>
+    <div class="user-pill" onclick="go('profile')">
+      <div class="av">JD</div><div class="uname">jdoe</div>
+    </div>
+  </div>
+</nav>
+
+<div class="toast" id="toast"><span id="t-icon">✓</span><span id="t-msg"></span></div>
+
+<!-- ══ LEARN ══ -->
+<div class="page active" id="pg-learn">
+  <div class="hero">
+    <div class="hero-eye">// UTech CTF Hub — Semester 2, 2026</div>
+    <div class="hero-h1">Ethical Hacking <span>Learning Platform</span></div>
+    <div class="hero-sub">Master cybersecurity through structured lessons and hands-on CTF challenges. Progressive difficulty from Beginner to Advanced.</div>
+    <div class="hero-stats">
+      <div><div class="hs-val">18+</div><div class="hs-lab">Challenges</div></div>
+      <div><div class="hs-val">6</div><div class="hs-lab">Categories</div></div>
+      <div><div class="hs-val">3</div><div class="hs-lab">Quizzes</div></div>
+      <div><div class="hs-val">1</div><div class="hs-lab">Jeopardy Board</div></div>
+    </div>
+  </div>
+  <div class="slabel">Learning Tracks</div>
+  <div class="track-grid" id="track-grid"></div>
+  <div class="topic-panel" id="topic-panel">
+    <div class="tp-head">
+      <div class="tp-title" id="tp-title"></div>
+      <button class="btn btn-ghost" onclick="closeTopic()">Close</button>
+    </div>
+    <div class="tp-body">
+      <div>
+        <div class="tp-sec"><h4>Key Points</h4><ul class="bullet-list" id="tp-bullets"></ul></div>
+        <div class="tp-sec" style="margin-top:18px"><h4>Examples</h4><div id="tp-examples"></div></div>
+      </div>
+      <div>
+        <div class="tp-sec"><h4>Self-Check</h4><div id="tp-quizzes"></div></div>
+        <div class="tp-sec" style="margin-top:18px"><h4>Recommended Challenges</h4><div class="rec-box" id="tp-recs"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CHALLENGES ══ -->
+<div class="page" id="pg-challenges">
+  <div class="ch-toolbar">
+    <input class="ch-search" id="ch-search" type="text" placeholder="Search challenges..." oninput="renderChallenges()">
+    <div class="fgrp" id="cat-filters">
+      <button class="fbtn on" data-cat="all"     onclick="setCat(this)">All</button>
+      <button class="fbtn"    data-cat="web"     onclick="setCat(this)">Web</button>
+      <button class="fbtn"    data-cat="crypto"  onclick="setCat(this)">Crypto</button>
+      <button class="fbtn"    data-cat="forensics" onclick="setCat(this)">Forensics</button>
+      <button class="fbtn"    data-cat="reverse" onclick="setCat(this)">Reverse</button>
+      <button class="fbtn"    data-cat="network" onclick="setCat(this)">Network</button>
+      <button class="fbtn"    data-cat="social"  onclick="setCat(this)">Social</button>
+    </div>
+    <div class="fgrp" id="diff-filters">
+      <button class="fbtn on"    data-diff="all"          onclick="setDiff(this)">All</button>
+      <button class="fbtn"       data-diff="beginner"     onclick="setDiff(this)">Beginner</button>
+      <button class="fbtn dm"    data-diff="intermediate" onclick="setDiff(this)">Intermediate</button>
+      <button class="fbtn dh"    data-diff="advanced"     onclick="setDiff(this)">Advanced</button>
+    </div>
+  </div>
+  <div class="ch-grid" id="ch-grid"></div>
+</div>
+
+<!-- Challenge modal -->
+<div class="overlay" id="ch-overlay">
+  <div class="modal">
+    <div class="mhead">
+      <div>
+        <div class="m-title" id="m-title"></div>
+        <div class="m-meta" id="m-meta"></div>
+      </div>
+      <button class="m-close" onclick="closeModal()">&#x2715;</button>
+    </div>
+    <div class="mbody">
+      <div class="msec">
+        <div class="msec-title">Scenario</div>
+        <div class="scenario-box" id="m-scenario"></div>
+      </div>
+      <div class="msec" id="m-files-sec">
+        <div class="msec-title">Files</div>
+        <div id="m-files"></div>
+      </div>
+      <div class="msec">
+        <div class="msec-title">Submit Flag</div>
+        <div class="flag-row">
+          <input class="flag-inp" id="flag-inp" type="text" placeholder="CTF{your_flag_here}">
+          <button class="btn btn-green" onclick="submitFlag()">Submit</button>
+        </div>
+      </div>
+      <div class="msec">
+        <div class="hint-btn" onclick="toggleHint()">&#x1F4A1; Show Hint <span style="color:var(--text2);font-size:10px;margin-left:4px;">(-25 pts)</span></div>
+        <div class="hint-box" id="hint-box"></div>
+      </div>
+      <div class="msec">
+        <div class="msec-title">What You Will Learn</div>
+        <div class="learned-box"><ul id="m-learned"></ul></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ JEOPARDY ══ -->
+<div class="page" id="pg-jeopardy">
+  <div class="jeop-hd">
+    <div>
+      <div class="slabel" style="margin-bottom:4px">Jeopardy Board</div>
+      <div style="font-size:12px;color:var(--text2)">Click a tile to answer. Correct answers earn points.</div>
+    </div>
+    <div class="jeop-sc">Session: <span id="jscore">0</span> pts</div>
+  </div>
+  <div class="jeop-wrap"><table class="jeop-tbl" id="jeop-tbl"></table></div>
+</div>
+
+<div class="jmodal" id="jmodal">
+  <div class="jcard">
+    <div class="jq-cat" id="jq-cat"></div>
+    <div class="jq-pts" id="jq-pts"></div>
+    <div class="jq-text" id="jq-text"></div>
+    <div class="jq-opts" id="jq-opts"></div>
+    <div class="jresult" id="jresult"></div>
+    <button class="btn btn-ghost" id="j-close" style="margin-top:16px;width:100%" onclick="closeJeop()" disabled>Close</button>
+  </div>
+</div>
+
+<!-- ══ QUIZZES ══ -->
+<div class="page" id="pg-quizzes">
+  <div class="slabel">Available Quizzes</div>
+  <div class="quiz-grid" id="quiz-grid"></div>
+  <div class="qactive" id="qactive">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+      <div style="font-family:var(--head);font-size:13px;color:#fff" id="qa-title"></div>
+      <button class="btn btn-ghost" onclick="exitQuiz()">Exit</button>
+    </div>
+    <div class="qprog">
+      <div class="qnum" id="qa-num">Q 1/10</div>
+      <div class="qbar"><div class="qbar-fill" id="qa-bar" style="width:10%"></div></div>
+      <div class="qscore" id="qa-score">Score: 0</div>
+    </div>
+    <div class="aq-box" id="aq-box">
+      <div class="aq-text" id="aq-text"></div>
+      <div class="aq-opts" id="aq-opts"></div>
+      <div class="qfeedback" id="aq-fb"></div>
+      <div style="text-align:right;margin-top:16px">
+        <button class="btn btn-green" id="aq-next" onclick="nextQ()" style="display:none">Next &#x2192;</button>
+      </div>
+    </div>
+    <div class="qresult" id="qresult">
+      <div class="res-big" id="res-big"></div>
+      <div class="res-lab">Questions Correct</div>
+      <div class="res-msg" id="res-msg"></div>
+      <button class="btn btn-green" onclick="exitQuiz()">Back to Quizzes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SCOREBOARD ══ -->
+<div class="page" id="pg-scoreboard">
+  <div class="sb-top">
+    <div class="sb-ttl">LEADERBOARD</div>
+    <div class="live">&#x25CF; LIVE</div>
+  </div>
+  <div class="podium" id="podium"></div>
+  <div class="slabel" style="margin-bottom:12px">Full Rankings</div>
+  <div class="sb-wrap">
+    <table class="sb-tbl">
+      <thead><tr><th>#</th><th>Player</th><th>Score</th><th>Solves</th><th>Progress</th></tr></thead>
+      <tbody id="sb-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══ PROFILE ══ -->
+<div class="page" id="pg-profile">
+  <div class="prof-layout">
+    <div>
+      <div class="prof-card">
+        <div class="prof-av">JD</div>
+        <div class="prof-name">John Doe</div>
+        <div class="prof-handle">@jdoe &middot; Student</div>
+        <div class="prof-pts" id="prof-pts">1,337</div>
+        <div class="prof-plab">Total Points</div>
+        <div class="prof-rank">Rank <span>#7</span> of 42</div>
+        <div class="prof-badges">
+          <div class="pbadge">CRYPTO STARTER</div>
+          <div class="pbadge">WEB WARRIOR</div>
+          <div class="pbadge">FORENSIC EYE</div>
+          <div class="pbadge">FIRST BLOOD</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="slabel" style="margin-bottom:12px">Statistics</div>
+      <div class="stats3">
+        <div class="stat-box"><div class="stat-n">12</div><div class="stat-l">Solved</div></div>
+        <div class="stat-box"><div class="stat-n">3</div><div class="stat-l">Quizzes</div></div>
+        <div class="stat-box"><div class="stat-n">4</div><div class="stat-l">Badges</div></div>
+      </div>
+      <div class="slabel" style="margin-bottom:12px">Category Progress</div>
+      <div class="card" style="margin-bottom:16px" id="cat-prog"></div>
+      <div class="slabel" style="margin-bottom:12px">Recent Solves</div>
+      <div class="hist-wrap">
+        <table class="hist-tbl">
+          <thead><tr><th>Challenge</th><th>Category</th><th>Difficulty</th><th>Points</th><th>Time</th></tr></thead>
+          <tbody id="hist-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ LOGIN ══ -->
+<div class="page" id="pg-login">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-logo">UTECH::CTF</div>
+      <div class="auth-tabs">
+        <button class="atab on" id="atab-in"  onclick="setAuthTab('in')">Sign In</button>
+        <button class="atab"    id="atab-reg" onclick="setAuthTab('reg')">Register</button>
+      </div>
+      <div id="aform-in">
+        <div class="field"><label>Username</label><input type="text" placeholder="your_handle"></div>
+        <div class="field"><label>Password</label><input type="password" placeholder="&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;"></div>
+        <button class="auth-btn" onclick="doLogin()">Access System</button>
+        <div class="auth-note">No account? <span onclick="setAuthTab('reg')">Register here</span></div>
+      </div>
+      <div id="aform-reg" style="display:none">
+        <div class="field"><label>Username</label><input type="text" placeholder="choose_handle"></div>
+        <div class="field"><label>Email</label><input type="email" placeholder="you@utech.edu.jm"></div>
+        <div class="field">
+          <label>Password</label>
+          <input type="password" placeholder="min 8 characters" oninput="checkStr(this)">
+          <div class="str-bars"><div class="sbar" id="sb1"></div><div class="sbar" id="sb2"></div><div class="sbar" id="sb3"></div><div class="sbar" id="sb4"></div></div>
+        </div>
+        <button class="auth-btn" onclick="doLogin()">Create Account</button>
+        <div class="auth-note">Have an account? <span onclick="setAuthTab('in')">Sign in</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ADMIN ══ -->
+<div class="page" id="pg-admin">
+  <div class="adm-layout">
+    <div class="adm-sidebar">
+      <div class="adm-sttl">Admin Panel</div>
+      <button class="adm-nav on" id="an-dash"   onclick="adSec('dash',this)">&#x1F4CA; Dashboard</button>
+      <button class="adm-nav"    id="an-chs"    onclick="adSec('chs',this)">&#x1F3AF; Challenges</button>
+      <button class="adm-nav"    id="an-add"    onclick="adSec('add',this)">&#x2795; Add Challenge</button>
+      <button class="adm-nav"    id="an-users"  onclick="adSec('users',this)">&#x1F465; Users</button>
+      <button class="adm-nav"    id="an-reset"  onclick="adSec('reset',this)">&#x1F504; Reset / Export</button>
+    </div>
+    <div>
+
+      <div class="adm-sec active" id="ads-dash">
+        <div class="slabel" style="margin-bottom:14px">Platform Overview</div>
+        <div class="adm-stats">
+          <div class="as-box"><div class="as-val">18</div><div class="as-lbl">Challenges</div></div>
+          <div class="as-box"><div class="as-val">42</div><div class="as-lbl">Students</div></div>
+          <div class="as-box"><div class="as-val">267</div><div class="as-lbl">Solves</div></div>
+          <div class="as-box"><div class="as-val">3</div><div class="as-lbl">Quizzes</div></div>
+        </div>
+        <div class="card">
+          <div style="font-family:var(--head);font-size:12px;color:#fff;margin-bottom:14px">Recent Activity</div>
+          <table class="adm-tbl">
+            <thead><tr><th>User</th><th>Action</th><th>Challenge</th><th>Time</th></tr></thead>
+            <tbody>
+              <tr><td style="font-family:var(--mono)">0xGh0st</td><td style="color:var(--accent)">Solved</td><td>Stack Overflow</td><td style="color:var(--text2)">2m ago</td></tr>
+              <tr><td style="font-family:var(--mono)">null_ptr</td><td style="color:var(--cyan)">Attempted</td><td>RSA Puzzle</td><td style="color:var(--text2)">5m ago</td></tr>
+              <tr><td style="font-family:var(--mono)">bytebender</td><td style="color:var(--accent)">Solved</td><td>XSS Playground</td><td style="color:var(--text2)">12m ago</td></tr>
+              <tr><td style="font-family:var(--mono)">jdoe</td><td style="color:var(--amber)">Hint Used</td><td>Vigenere Cipher</td><td style="color:var(--text2)">18m ago</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="adm-sec" id="ads-chs">
+        <div class="slabel" style="margin-bottom:14px">Manage Challenges</div>
+        <div class="card"><table class="adm-tbl"><thead><tr><th>Title</th><th>Category</th><th>Difficulty</th><th>Points</th><th>Enabled</th><th>Actions</th></tr></thead><tbody id="adm-ch-tbody"></tbody></table></div>
+      </div>
+
+      <div class="adm-sec" id="ads-add">
+        <div class="slabel" style="margin-bottom:14px">Add New Challenge</div>
+        <div class="card">
+          <div class="form-grid">
+            <div class="adm-field"><label>Title</label><input type="text" placeholder="Challenge name"></div>
+            <div class="adm-field"><label>Category</label><select><option>Web Hacking</option><option>Cryptography</option><option>Forensics</option><option>Reverse Engineering</option><option>Network Security</option><option>Social Engineering</option></select></div>
+            <div class="adm-field"><label>Difficulty</label><select><option>Beginner</option><option>Intermediate</option><option>Advanced</option></select></div>
+            <div class="adm-field"><label>Points</label><input type="number" placeholder="100"></div>
+            <div class="adm-field" style="grid-column:span 2"><label>Description</label><input type="text" placeholder="Short description shown on card"></div>
+            <div class="adm-field" style="grid-column:span 2"><label>Scenario / Prompt</label><textarea placeholder="Full challenge scenario..."></textarea></div>
+            <div class="adm-field"><label>Flag (exact)</label><input type="text" placeholder="CTF{flag_here}"></div>
+            <div class="adm-field"><label>Hint Text</label><input type="text" placeholder="Optional hint text"></div>
+            <div class="adm-field"><label>Hint Cost (pts)</label><input type="number" placeholder="25"></div>
+            <div class="adm-field"><label>Enabled</label><select><option>Yes</option><option>No</option></select></div>
+            <div class="adm-field" style="grid-column:span 2">
+              <label>Upload Files</label>
+              <div class="upload-z" onclick="toast('File upload ready — connect backend','info')">
+                <p>&#x1F4C1; Click to upload challenge files (zip / pdf / txt / pcap)</p>
+                <p style="margin-top:5px;font-size:10px;color:var(--text2)">Drag and drop supported</p>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:16px;display:flex;gap:8px">
+            <button class="btn btn-green" onclick="toast('Challenge saved!','ok')">Save Challenge</button>
+            <button class="btn btn-ghost">Clear Form</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="adm-sec" id="ads-users">
+        <div class="slabel" style="margin-bottom:14px">Manage Users</div>
+        <div class="card">
+          <table class="adm-tbl">
+            <thead><tr><th>Username</th><th>Email</th><th>Role</th><th>Points</th><th>Solves</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr><td style="font-family:var(--mono)">0xGh0st</td><td style="color:var(--text2)">ghost@utech.edu.jm</td><td><span class="badge b-easy">Student</span></td><td style="color:var(--accent);font-family:var(--mono)">4820</td><td>38</td><td class="act-row"><button class="act act-e" onclick="toast('Editing user...','info')">Edit</button><button class="act act-d" onclick="toast('User removed','err')">Remove</button></td></tr>
+              <tr><td style="font-family:var(--mono)">null_ptr</td><td style="color:var(--text2)">null@utech.edu.jm</td><td><span class="badge b-easy">Student</span></td><td style="color:var(--accent);font-family:var(--mono)">4225</td><td>34</td><td class="act-row"><button class="act act-e" onclick="toast('Editing user...','info')">Edit</button><button class="act act-d" onclick="toast('User removed','err')">Remove</button></td></tr>
+              <tr><td style="font-family:var(--mono)">dr_smith</td><td style="color:var(--text2)">smith@utech.edu.jm</td><td><span class="badge b-amber">Admin</span></td><td style="color:var(--text2)">&#x2014;</td><td>&#x2014;</td><td class="act-row"><button class="act act-e" onclick="toast('Editing user...','info')">Edit</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="adm-sec" id="ads-reset">
+        <div class="slabel" style="margin-bottom:14px">Reset and Export</div>
+        <div class="card">
+          <div class="reset-box">
+            <div><div class="rst-h">Reset Scoreboard</div><div class="rst-p">Clears all points and solves. Use at start of new semester. Challenges and users are kept.</div></div>
+            <button class="btn btn-red" onclick="confirmReset()">Reset Scores</button>
+          </div>
+          <div class="reset-box warn" style="margin-top:10px">
+            <div><div class="rst-h w">Export Challenge Pack</div><div class="rst-p">Download all challenges as JSON for backup or next semester transfer.</div></div>
+            <button class="btn btn-outline" style="color:var(--amber);border-color:var(--amber)" onclick="toast('Exporting challenges.json...','info')">Export JSON</button>
+          </div>
+          <div style="margin-top:16px">
+            <div style="font-family:var(--head);font-size:12px;color:#fff;margin-bottom:12px">Bulk Toggle</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="btn btn-ghost" onclick="toast('Beginner challenges enabled','ok')">Enable Beginner</button>
+              <button class="btn btn-ghost" onclick="toast('Intermediate challenges enabled','ok')">Enable Intermediate</button>
+              <button class="btn btn-ghost" onclick="toast('Advanced challenges enabled','ok')">Enable Advanced</button>
+              <button class="btn" style="background:transparent;color:var(--red);border:1px solid rgba(255,61,90,.4)" onclick="toast('All challenges disabled','err')">Disable All</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
